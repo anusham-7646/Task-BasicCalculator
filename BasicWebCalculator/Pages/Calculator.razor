@@ -1,0 +1,97 @@
+﻿@page "/calculator"
+@inject IHttpClientFactory httpClientFactory
+
+<h1 class=text-danger> Calculator </h1>
+<br />
+<div>
+    <div class="row">
+        <div class="col-lg-3">
+            <p>First Number</p>
+        </div>
+        <div class="col-lg-4">
+            <input type="text" name="FirstNumber" @bind="@firstNumber" />
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-3">
+            <p>Second Number</p>
+        </div>
+        <div class="col-lg-4">
+            <input type="text" name="SecondNumber" @bind="@secondNumber" />
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-3">
+            <p>Result</p>
+        </div>
+        <div class="col-lg-4">
+            <input type="text" readonly @bind="@result" />
+            <p>@error</p>
+        </div>
+    </div> <br />
+    <div class="row">
+        <div class="col-lg-2">
+            <button @onclick="AddNumbers" class="btn btn-secondary">Add (+)</button>
+        </div>
+        <div class="col-lg-2">
+            <button @onclick="SubtractNumbers" class="btn btn-primary">Subtract (−)</button>
+        </div>
+        <div class="col-lg-2">
+            <button @onclick="MultiplyNumbers" class="btn btn-success ">Multiply (X)</button>
+        </div>
+        <div class="col-lg-2">
+            <button @onclick="DivideNumbers" class="btn btn-info">Divide (/)</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    double firstNumber, secondNumber, result;
+    string operation = string.Empty, error;
+
+    public async void AddNumbers()
+    {
+        operation = "add";
+        await LoadResult();
+    }
+
+    public async void SubtractNumbers()
+    {
+        operation = "subtract";
+        await LoadResult();
+    }
+
+    public async void MultiplyNumbers()
+    {
+        operation = "multiply";
+        await LoadResult();
+    }
+
+    public async void DivideNumbers()
+    {
+        operation = "divide";
+        await LoadResult();
+    }
+
+    protected async Task LoadResult()
+    {
+        error = string.Empty;
+        if (secondNumber == 0 && operation == "divide")
+        {
+            error = "secondNumber should be greater than 0";
+            result = 0;
+        }
+        else
+        {
+            result = await httpClientFactory.CreateClient("Anonymous").GetFromJsonAsync<double>($"api/calculator/firstNumber/{firstNumber}/secondNumber/{secondNumber}/operation/{operation}");
+        }
+        StateHasChanged();
+    }
+}
+
+
+
+
+
